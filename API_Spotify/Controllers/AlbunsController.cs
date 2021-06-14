@@ -28,8 +28,9 @@ namespace API_Spotify.Controllers
             {
                 var numeroPagina = paginacaoParametros.NumeroPagina;
                 var tamanhoPagina = paginacaoParametros.TamanhoPagina;
-                var lista = _context.Albuns.Include(y => y.Genero).OrderBy(x => x.Titulo);
+                var lista = _context.Albuns.OrderBy(x => x.Titulo);
                 return lista
+                    .Include(y => y.Genero)
                     .Skip((numeroPagina - 1) * tamanhoPagina).Take(tamanhoPagina)
                     .AsNoTracking().ToList();
             }

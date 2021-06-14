@@ -27,9 +27,11 @@ namespace API_Spotify.Controllers
             {
                 var numeroPagina = paginacaoParametros.NumeroPagina;
                 var tamanhoPagina = paginacaoParametros.TamanhoPagina;
-                return _context.Vendas
-                    .AsNoTracking()
-                    .ToList();
+                var lista = _context.Vendas.OrderByDescending(x => x.DataVenda);
+                return lista
+                    .Include(x => x.VendaItens)
+                    .Skip((numeroPagina - 1) * tamanhoPagina).Take(tamanhoPagina)
+                    .AsNoTracking().ToList();
                 //return _context.Vendas.Include(x => x.VendaItens).AsNoTracking().ToList();
             }
             catch (Exception e)

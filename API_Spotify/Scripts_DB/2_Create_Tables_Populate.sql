@@ -1,6 +1,15 @@
-﻿
---DROP DATABASE [Spotify_DB];
---CREATE DATABASE [Spotify_DB];
+﻿-- ============================================================= 
+-- Criado por : Renato Cavalcante
+-- Finalidade : Script para criar DB, tabelas e inserir dados 
+-- Data : 2021-jun-14
+-- =============================================================
+--
+IF EXISTS (SELECT [name] FROM sys.databases WHERE [name] = 'Spotify_DB' ) 
+DROP DATABASE [Spotify_DB];
+GO 
+
+CREATE DATABASE [Spotify_DB];
+GO
 
 USE [Spotify_DB]
 GO
@@ -21,7 +30,6 @@ CREATE TABLE [dbo].[Genero](
 ) ON [PRIMARY]
 GO
 
-/* POPULATE GENERO */
 INSERT INTO [dbo].[Genero] VALUES('POP');
 INSERT INTO [dbo].[Genero] VALUES('MPB');
 INSERT INTO [dbo].[Genero] VALUES('CLASSIC');
@@ -48,7 +56,6 @@ GO
 ALTER TABLE [dbo].[Album] CHECK CONSTRAINT [FK_Album_Genero_GeneroId]
 GO
 
-/* POPULATE Album */
 INSERT INTO [dbo].[Album] VALUES('ARIANA GRANDE', 19.99, (SELECT GENEROID FROM [dbo].[Genero] WHERE NOME='POP'));
 INSERT INTO [dbo].[Album] VALUES('PHARREL WILLIAMS', 19.99, (SELECT GENEROID FROM [dbo].[Genero] WHERE NOME='POP'));
 INSERT INTO [dbo].[Album] VALUES('SEAL CRAZY', 19.99, (SELECT GENEROID FROM [dbo].[Genero] WHERE NOME='POP'));
@@ -66,8 +73,7 @@ INSERT INTO [dbo].[Album] VALUES('LENNY KRAVITZ', 19.99, (SELECT GENEROID FROM [
 INSERT INTO [dbo].[Album] VALUES('PINK FLOYD', 19.99, (SELECT GENEROID FROM [dbo].[Genero] WHERE NOME='ROCK'));
 
 
---SELECT * FROM [dbo].[Genero]
---SELECT * FROM [dbo].[Album]
+
 
 CREATE TABLE [dbo].[Cashback](
 	[CashbackId] [int] IDENTITY(1,1) NOT NULL,
@@ -181,7 +187,7 @@ select @minimo = MIN(AlbumId) FROM [dbo].[Album];
 declare @maximo as integer = 0;
 select @maximo = MAX(AlbumId) FROM [dbo].[Album];
 
-INSERT INTO [dbo].[Venda] VALUES (CAST(GETDATE() AS DATE), 'Jonas Batista', 2 * 19.99, 0);
+INSERT INTO [dbo].[Venda] VALUES (GETDATE(), 'Jonas Batista', 2 * 19.99, 0);
 INSERT INTO [dbo].[VendaItem] VALUES (1, 19.99, ABS(CHECKSUM(NEWID()) % (@maximo - @minimo - 1)) + @minimo, (SELECT MAX(VendaId) FROM [dbo].[Venda]))
 INSERT INTO [dbo].[VendaItem] VALUES (1, 19.99, ABS(CHECKSUM(NEWID()) % (@maximo - @minimo - 1)) + @minimo, (SELECT MAX(VendaId) FROM [dbo].[Venda]))
 UPDATE [dbo].[Venda] SET TotalCashback = (
@@ -194,22 +200,8 @@ WHERE [dbo].[Venda].VendaId = (SELECT MAX(VendaId) FROM [dbo].[Venda])
 ) result
 ) WHERE VendaId = (SELECT MAX(VendaId) FROM [dbo].[Venda])
 
-INSERT INTO [dbo].[Venda] VALUES (CAST(GETDATE()-1 AS DATE), 'Aline Soares', 4 * 19.99, 0);
+INSERT INTO [dbo].[Venda] VALUES (GETDATE()-1, 'Aline Soares', 4 * 19.99, 0);
 INSERT INTO [dbo].[VendaItem] VALUES (1, 19.99, ABS(CHECKSUM(NEWID()) % (@maximo - @minimo - 1)) + @minimo, (SELECT MAX(VendaId) FROM [dbo].[Venda]))
-INSERT INTO [dbo].[VendaItem] VALUES (1, 19.99, ABS(CHECKSUM(NEWID()) % (@maximo - @minimo - 1)) + @minimo, (SELECT MAX(VendaId) FROM [dbo].[Venda]))
-INSERT INTO [dbo].[VendaItem] VALUES (1, 19.99, ABS(CHECKSUM(NEWID()) % (@maximo - @minimo - 1)) + @minimo, (SELECT MAX(VendaId) FROM [dbo].[Venda]))
-INSERT INTO [dbo].[VendaItem] VALUES (1, 19.99, ABS(CHECKSUM(NEWID()) % (@maximo - @minimo - 1)) + @minimo, (SELECT MAX(VendaId) FROM [dbo].[Venda]))
-UPDATE [dbo].[Venda] SET TotalCashback = (
-SELECT SUM(Cashback) from (
-SELECT (Quantidade*ValorUnitario)*(Percentual/100) 'Cashback' FROM [dbo].[Venda]
-LEFT JOIN [dbo].[VendaItem] ON [dbo].[VendaItem].VendaId = [dbo].[Venda].VendaId 
-LEFT JOIN [dbo].[Album] ON [dbo].[Album].AlbumId = [dbo].[VendaItem].AlbumId 
-LEFT JOIN [dbo].[Cashback] ON [dbo].[Cashback].GeneroId = [dbo].[Album].GeneroId AND DiaSemana = DATEPART(dw,[dbo].[Venda].DataVenda)
-WHERE [dbo].[Venda].VendaId = (SELECT MAX(VendaId) FROM [dbo].[Venda])
-) result
-) WHERE VendaId = (SELECT MAX(VendaId) FROM [dbo].[Venda])
-
-INSERT INTO [dbo].[Venda] VALUES (CAST(GETDATE()-2 AS DATE), 'Rosimeire Silva', 3 * 19.99, 0);
 INSERT INTO [dbo].[VendaItem] VALUES (1, 19.99, ABS(CHECKSUM(NEWID()) % (@maximo - @minimo - 1)) + @minimo, (SELECT MAX(VendaId) FROM [dbo].[Venda]))
 INSERT INTO [dbo].[VendaItem] VALUES (1, 19.99, ABS(CHECKSUM(NEWID()) % (@maximo - @minimo - 1)) + @minimo, (SELECT MAX(VendaId) FROM [dbo].[Venda]))
 INSERT INTO [dbo].[VendaItem] VALUES (1, 19.99, ABS(CHECKSUM(NEWID()) % (@maximo - @minimo - 1)) + @minimo, (SELECT MAX(VendaId) FROM [dbo].[Venda]))
@@ -223,7 +215,21 @@ WHERE [dbo].[Venda].VendaId = (SELECT MAX(VendaId) FROM [dbo].[Venda])
 ) result
 ) WHERE VendaId = (SELECT MAX(VendaId) FROM [dbo].[Venda])
 
-INSERT INTO [dbo].[Venda] VALUES (CAST(GETDATE()-3 AS DATE), 'Nivea Maria', 6 * 19.99, 0);
+INSERT INTO [dbo].[Venda] VALUES (GETDATE()-2, 'Rosimeire Silva', 3 * 19.99, 0);
+INSERT INTO [dbo].[VendaItem] VALUES (1, 19.99, ABS(CHECKSUM(NEWID()) % (@maximo - @minimo - 1)) + @minimo, (SELECT MAX(VendaId) FROM [dbo].[Venda]))
+INSERT INTO [dbo].[VendaItem] VALUES (1, 19.99, ABS(CHECKSUM(NEWID()) % (@maximo - @minimo - 1)) + @minimo, (SELECT MAX(VendaId) FROM [dbo].[Venda]))
+INSERT INTO [dbo].[VendaItem] VALUES (1, 19.99, ABS(CHECKSUM(NEWID()) % (@maximo - @minimo - 1)) + @minimo, (SELECT MAX(VendaId) FROM [dbo].[Venda]))
+UPDATE [dbo].[Venda] SET TotalCashback = (
+SELECT SUM(Cashback) from (
+SELECT (Quantidade*ValorUnitario)*(Percentual/100) 'Cashback' FROM [dbo].[Venda]
+LEFT JOIN [dbo].[VendaItem] ON [dbo].[VendaItem].VendaId = [dbo].[Venda].VendaId 
+LEFT JOIN [dbo].[Album] ON [dbo].[Album].AlbumId = [dbo].[VendaItem].AlbumId 
+LEFT JOIN [dbo].[Cashback] ON [dbo].[Cashback].GeneroId = [dbo].[Album].GeneroId AND DiaSemana = DATEPART(dw,[dbo].[Venda].DataVenda)
+WHERE [dbo].[Venda].VendaId = (SELECT MAX(VendaId) FROM [dbo].[Venda])
+) result
+) WHERE VendaId = (SELECT MAX(VendaId) FROM [dbo].[Venda])
+
+INSERT INTO [dbo].[Venda] VALUES (GETDATE()-3, 'Nivea Maria', 6 * 19.99, 0);
 INSERT INTO [dbo].[VendaItem] VALUES (2, 19.99, ABS(CHECKSUM(NEWID()) % (@maximo - @minimo - 1)) + @minimo, (SELECT MAX(VendaId) FROM [dbo].[Venda]))
 INSERT INTO [dbo].[VendaItem] VALUES (3, 19.99, ABS(CHECKSUM(NEWID()) % (@maximo - @minimo - 1)) + @minimo, (SELECT MAX(VendaId) FROM [dbo].[Venda]))
 INSERT INTO [dbo].[VendaItem] VALUES (1, 19.99, ABS(CHECKSUM(NEWID()) % (@maximo - @minimo - 1)) + @minimo, (SELECT MAX(VendaId) FROM [dbo].[Venda]))
@@ -237,7 +243,7 @@ WHERE [dbo].[Venda].VendaId = (SELECT MAX(VendaId) FROM [dbo].[Venda])
 ) result
 ) WHERE VendaId = (SELECT MAX(VendaId) FROM [dbo].[Venda])
 
-INSERT INTO [dbo].[Venda] VALUES (CAST(GETDATE()-4 AS DATE), 'Sofia Regina', 5 * 19.99, 0);
+INSERT INTO [dbo].[Venda] VALUES (GETDATE()-4, 'Sofia Regina', 5 * 19.99, 0);
 INSERT INTO [dbo].[VendaItem] VALUES (1, 19.99, ABS(CHECKSUM(NEWID()) % (@maximo - @minimo - 1)) + @minimo, (SELECT MAX(VendaId) FROM [dbo].[Venda]))
 INSERT INTO [dbo].[VendaItem] VALUES (2, 19.99, ABS(CHECKSUM(NEWID()) % (@maximo - @minimo - 1)) + @minimo, (SELECT MAX(VendaId) FROM [dbo].[Venda]))
 INSERT INTO [dbo].[VendaItem] VALUES (2, 19.99, ABS(CHECKSUM(NEWID()) % (@maximo - @minimo - 1)) + @minimo, (SELECT MAX(VendaId) FROM [dbo].[Venda]))
@@ -253,5 +259,6 @@ WHERE [dbo].[Venda].VendaId = (SELECT MAX(VendaId) FROM [dbo].[Venda])
 
 --SELECT * FROM [dbo].[Venda] 
 --SELECT * FROM [dbo].[VendaItem] WHERE VendaId = (SELECT MAX(VendaId) FROM [dbo].[Venda])
---DELETE FROM [dbo].[Venda]
---DELETE FROM [dbo].[VendaItem]
+--SELECT * FROM [dbo].[Album] ORDER BY 2
+--SELECT * FROM [dbo].[Genero]
+

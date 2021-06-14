@@ -25,7 +25,7 @@ namespace API_Spotify.Controllers
         {
             try
             {
-                return _context.Albuns.OrderBy(x => x.Titulo).AsNoTracking().ToList();
+                return _context.Albuns.Include(y => y.Genero).OrderBy(x => x.Titulo).AsNoTracking().ToList();
             }
             catch (Exception e)
             {

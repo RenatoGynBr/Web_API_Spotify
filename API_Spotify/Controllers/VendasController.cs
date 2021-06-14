@@ -60,6 +60,7 @@ namespace API_Spotify.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Erro: " + e.Message);
             }
         }
+
         /*
         [HttpGet]
         public IEnumerable<minhaVenda> GetDetalhes()
@@ -82,6 +83,30 @@ namespace API_Spotify.Controllers
             return results;
         }
         */
+        /*
+                *** REGISTRAR NOVA VENDA com CASHBACK (implementar via EF)
+                *-- insert [Venda]: DataVenda, NomeCliente, TotalVenda, TotalCashback
+                INSERT INTO [dbo].[Venda] VALUES ('2021-6-15', 'Edson Arantes', 100, 20);
+
+                -- insert [VendaItem]: Quantidade, ValorUnitario, IdProduto, IdVenda
+                INSERT INTO [dbo].[VendaItem] VALUES (2, 19.99, 11, 44)
+
+                -- update TOTAL
+
+                -- update CASHBACK
+                *** Cálculo de CASHBACK (implementar via EF)
+                * 
+                UPDATE [dbo].[Venda] SET TotalCashback = (
+                SELECT SUM(Cashback) from (
+                SELECT (Quantidade*ValorUnitario)*(Percentual/100) 'Cashback' FROM [dbo].[Venda]
+                LEFT JOIN [dbo].[VendaItem] ON [dbo].[VendaItem].VendaId = [dbo].[Venda].VendaId 
+                LEFT JOIN [dbo].[Album] ON [dbo].[Album].AlbumId = [dbo].[VendaItem].AlbumId 
+                LEFT JOIN [dbo].[Cashback] ON [dbo].[Cashback].GeneroId = [dbo].[Album].GeneroId AND DiaSemana = DATEPART(dw,[dbo].[Venda].DataVenda)
+                WHERE [dbo].[Venda].VendaId = (SELECT MAX(VendaId) FROM [dbo].[Venda])
+                ) result
+                ) WHERE VendaId = (SELECT MAX(VendaId) FROM [dbo].[Venda])
+                *
+                */
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutVenda(int id, Venda venda)

@@ -3,7 +3,7 @@ Sistema Web API de e-commerce baseado em informações do Spotify
 
 Instruções:
 
-1 - Dar download no Projeto;
+1 - Download em computador onde vai usar o Projeto;
 
 2 - Abra o Projeto no Visual Studio 2019 e faça as alterações necessárias no arquivo appSettings.json para acessar o Database;
 

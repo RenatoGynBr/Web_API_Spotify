@@ -1,5 +1,6 @@
 ﻿using API_Spotify.Context;
 using API_Spotify.Models;
+using API_Spotify.Pagination;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -20,12 +21,17 @@ namespace API_Spotify.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<Album>> Get()
+        [HttpGet(Name = "CatalogoAlbuns")]
+        public ActionResult<IEnumerable<Album>> Get([FromQuery] PaginacaoParametros paginacaoParametros)
         {
             try
             {
-                return _context.Albuns.Include(y => y.Genero).OrderBy(x => x.Titulo).AsNoTracking().ToList();
+                var numeroPagina = paginacaoParametros.NumeroPagina;
+                var tamanhoPagina = paginacaoParametros.TamanhoPagina;
+                var lista = _context.Albuns.Include(y => y.Genero).OrderBy(x => x.Titulo);
+                return lista
+                    .Skip((numeroPagina - 1) * tamanhoPagina).Take(tamanhoPagina)
+                    .AsNoTracking().ToList();
             }
             catch (Exception e)
             {
@@ -33,7 +39,7 @@ namespace API_Spotify.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "AlbumPorId")]
         public ActionResult<Album> Get(int id)
         {
             try

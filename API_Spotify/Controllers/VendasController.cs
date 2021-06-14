@@ -1,5 +1,6 @@
 ﻿using API_Spotify.Context;
 using API_Spotify.Models;
+using API_Spotify.Pagination;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -20,11 +21,15 @@ namespace API_Spotify.Controllers
             _context = context;
         }
         [HttpGet]
-        public ActionResult<IEnumerable<Venda>> Get()
+        public ActionResult<IEnumerable<Venda>> Get([FromQuery] PaginacaoParametros paginacaoParametros)
         {
             try
             {
-                return _context.Vendas.AsNoTracking().ToList();
+                var numeroPagina = paginacaoParametros.NumeroPagina;
+                var tamanhoPagina = paginacaoParametros.TamanhoPagina;
+                return _context.Vendas
+                    .AsNoTracking()
+                    .ToList();
                 //return _context.Vendas.Include(x => x.VendaItens).AsNoTracking().ToList();
             }
             catch (Exception e)
@@ -53,5 +58,23 @@ namespace API_Spotify.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Erro: " + e.Message);
             }
         }
+
+
+/*
+*** Cálculo de CASHBACK (implementar via EF)***
+* 
+UPDATE [dbo].[Venda] SET TotalCashback = (
+SELECT SUM(Cashback) from (
+SELECT (Quantidade*ValorUnitario)*(Percentual/100) 'Cashback' FROM [dbo].[Venda]
+LEFT JOIN [dbo].[VendaItem] ON [dbo].[VendaItem].VendaId = [dbo].[Venda].VendaId 
+LEFT JOIN [dbo].[Album] ON [dbo].[Album].AlbumId = [dbo].[VendaItem].AlbumId 
+LEFT JOIN [dbo].[Cashback] ON [dbo].[Cashback].GeneroId = [dbo].[Album].GeneroId AND DiaSemana = DATEPART(dw,[dbo].[Venda].DataVenda)
+WHERE [dbo].[Venda].VendaId = (SELECT MAX(VendaId) FROM [dbo].[Venda])
+) result
+) WHERE VendaId = (SELECT MAX(VendaId) FROM [dbo].[Venda])
+*
+*/
+
+
     }
 }

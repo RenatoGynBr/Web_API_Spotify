@@ -1,5 +1,5 @@
 # Web_API_Spotify
-Sistema de Web API com e-commerce baseado em informações do Spotify
+Sistema Web API de e-commerce baseado em informações do Spotify
 
 Instruções:
 

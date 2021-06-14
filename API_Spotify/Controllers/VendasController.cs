@@ -39,7 +39,11 @@ namespace API_Spotify.Controllers
             try
             {
                 //var entity = _context.Vendas.Find(id);
-                var entity = _context.Vendas.Include(x => x.VendaItens).AsNoTracking().FirstOrDefault(x => x.VendaId == id);
+                var entity = _context.Vendas
+                    .Include(x => x.VendaItens)
+                    .ThenInclude(y => y.Album)
+                    .AsNoTracking()
+                    .FirstOrDefault(x => x.VendaId == id);
                 if (entity == null)
                     return NotFound();
                 return entity;

@@ -1,0 +1,4 @@
+﻿
+--DROP DATABASE [Spotify_DB];
+CREATE DATABASE [Spotify_DB];
+
